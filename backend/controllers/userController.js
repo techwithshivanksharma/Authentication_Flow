@@ -43,4 +43,44 @@ const registerUser = async(req, res) => {
     });
 };
 
-module.exports = {registerUser};
+
+//Login User
+
+const loginUser = async (req, res) =>{
+    try{
+        const {email, password} = req.body;
+
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(400).json({message:"Invalid Email or Password"});
+        }
+
+        const isMatch = await bcrypt.compare(password,user.password);
+
+        if(!isMatch){
+            return res.status(400).json({message: "Invalid Password or Email"});
+        }
+
+        //token generate
+        const token = jwt.sign(
+            {id: user._id},
+            process.env.JWT_SECRET,
+            {expiresIn: "15d"}
+        );
+
+        res.status(200).json({
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            },
+            token
+        });
+    }catch(error){
+        res.status(500).json({message:"Server Error"});
+    }
+};
+
+module.exports = {registerUser, loginUser};
