@@ -79,8 +79,15 @@ const loginUser = async (req, res) =>{
             token
         });
     }catch(error){
+        console.error("LOGIN ERROR 👉", error);
         res.status(500).json({message:"Server Error"});
     }
 };
 
-module.exports = {registerUser, loginUser};
+const getUserProfile = async (req, res) => {
+    //req.user middleware se aaya hai
+    res.json(req.user);
+};
+
+
+module.exports = {registerUser, loginUser, getUserProfile};
